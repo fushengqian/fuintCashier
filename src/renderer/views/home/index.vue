@@ -20,6 +20,7 @@
 
 <script>
 import { useUserStore } from "@/store/user";
+import { removeUserId } from '@/utils/auth';
 import { Message } from "element-ui";
 const { logOut } = useUserStore();
 export default {
@@ -45,6 +46,7 @@ export default {
             message: "退出成功",
             type: "success"
           });
+          removeUserId();
           this.$router.push( '/login' );
         })
       }).catch(() => {});

@@ -65,11 +65,11 @@
   },
   "dependencies": {
     "axios": "^1.4.0",
+    "clipboard": "2.0.8",
     "electron-updater": "^5.3.0",
     "express": "4.18.2",
     "fs-extra": "^11.1.0",
-    "vue-print-nb": "^1.7.5",
-    "clipboard": "2.0.8"
+    "vue-print-nb": "^1.7.5"
   },
   "devDependencies": {
     "@babel/core": "^7.22.5",
@@ -110,7 +110,7 @@
     "date-fns": "^2.30.0",
     "del": "^6.1.1",
     "dotenv": "^16.1.4",
-    "electron": "^24.5.1",
+    "electron": "^24.8.1",
     "electron-builder": "^24.4.0",
     "electron-devtools-installer": "^3.2.0",
     "element-ui": "^2.15.13",
