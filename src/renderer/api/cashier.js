@@ -1,10 +1,11 @@
 import request from '@/utils/request'
 
 // 初始化数据
-export function init(userId) {
+export function init(userId, cateId, page, pageSize) {
   return request({
       url: 'backendApi/cashier/init/' + userId,
-      method: 'get'
+      method: 'get',
+      params: { cateId: cateId, page: page, pageSize: pageSize }
   })
 }
 
