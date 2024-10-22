@@ -1,11 +1,14 @@
 <template>
   <div class="coupon-container">
     <div class="main-panel">
-      <el-form class="form" ref="form" :model="form" :rules="rules" label-width="80px">
+      <el-form class="form" ref="form" :model="form" :rules="rules" label-width="100px">
         <el-row>
           <el-col :span="24">
             <el-form-item class="form-item" label="核销码" prop="code">
-                <el-input class="input-item" v-model="form.code" placeholder="请使用扫码枪扫描卡券二维码，或手工输入核销码" maxlength="100" />
+                <el-input class="input-item" v-model="form.code" clearable placeholder="请使用扫码枪扫描卡券二维码，或手工输入核销码" maxlength="100" />
+            </el-form-item>
+            <el-form-item class="none" label="卡券ID" prop="id">
+              <el-input class="input-item" v-model="form.id" clearable placeholder="请输入卡券ID"/>
             </el-form-item>
           </el-col>
         </el-row>
@@ -188,7 +191,7 @@ export default {
 <style scoped>
 .coupon-container {
   position: absolute;
-  top: 60px;
+  top: 30px;
   left: 165px;
   right: 10px;
 }
@@ -235,5 +238,8 @@ export default {
   line-height: 50px;
   padding: 0px 25px 0px 25px;
   height: 50px;
+}
+.none {
+  display: none;
 }
 </style>

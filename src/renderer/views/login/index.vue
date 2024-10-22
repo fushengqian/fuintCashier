@@ -40,7 +40,7 @@
           <button type="button" class="btn" @click="handleLogin()">立即登录</button>
         </div>
         <div class="tips">
-          <span>Copyright © 2020-2023 <a target="_blank" href="https://www.fuint.cn">fuint.cn</a> 延禾技术 All Rights Reserved.</span>
+          <span>Copyright © 2020-2024 <a target="_blank" href="https://www.fuint.cn">fuint.cn</a> 延禾技术 All Rights Reserved.</span>
         </div>
       </el-form>
     </div>
@@ -58,7 +58,7 @@ export default {
     return {
        systemName: process.env.userConfig.SYSTEM_NAME,
        loading: false,
-       loginForm: { uuid : '', username: "fuint", password: "123456", captchaCode: '' },
+       loginForm: { uuid : '', username: "", password: "", captchaCode: '' },
        codeUrl: '',
        pwdType: 'password',
        loginRules: {

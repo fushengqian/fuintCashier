@@ -10,7 +10,7 @@
          <div class="nav">欢迎使用{{ systemName }}</div>
          <div class="content">
            <div class="name">{{ systemName }}</div>
-           <div class="version">当前版本：V3.06</div>
+           <div class="version">当前版本：V3.0.9</div>
            <div class="back" @click="target()">
              <el-button type="danger" size="mini">返回主页</el-button>
            </div>

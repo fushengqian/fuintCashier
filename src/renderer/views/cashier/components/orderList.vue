@@ -158,7 +158,7 @@
               size="mini"
               type="text"
               class="main-text"
-              v-hasPermi="['order:edit']"
+              v-hasPermi="['cashier:index']"
               @click="handleUpdate(scope.row)"
           >修改</el-button>
           <el-button
@@ -166,7 +166,7 @@
               size="mini"
               type="text"
               class="main-text"
-              v-hasPermi="['order:edit']"
+              v-hasPermi="['cashier:index']"
               @click="handleExpress(scope.row)"
           >发货</el-button>
           <el-button
@@ -175,19 +175,19 @@
               size="mini"
               class="main-text"
               :disabled="scope.row.isVerify == true"
+              v-hasPermi="['cashier:index']"
               @click="handleVerify(scope.row)"
-              v-hasPermi="['order:edit']"
           >核销</el-button>
-          <el-dropdown size="mini" @command="(command) => handleCommand(command, scope.row)" v-hasPermi="['order:edit', 'order:delete']">
+          <el-dropdown size="mini" @command="(command) => handleCommand(command, scope.row)">
                 <span class="el-dropdown-link">
                   <i class="el-icon-d-arrow-right el-icon--right"></i>更多
                 </span>
             <el-dropdown-menu slot="dropdown">
-              <el-dropdown-item command="handleView" icon="el-icon-view" v-hasPermi="['order:index']">查看详情</el-dropdown-item>
-              <el-dropdown-item command="handlePrint" icon="el-icon-printer" v-hasPermi="['order:index']">打印小票</el-dropdown-item>
-              <el-dropdown-item command="handlePay" v-if="scope.row.payStatus != 'B'" icon="el-icon-wallet" v-hasPermi="['order:index']">发起支付</el-dropdown-item>
-              <el-dropdown-item v-if="scope.row.payStatus == 'B'" command="handleRefund" icon="el-icon-s-order" v-hasPermi="['order:index']">立即退款</el-dropdown-item>
-              <el-dropdown-item v-if="scope.row.payStatus != 'B'" command="handleDelete" icon="el-icon-remove" v-hasPermi="['order:delete']">删除订单</el-dropdown-item>
+              <el-dropdown-item command="handleView" icon="el-icon-view" v-hasPermi="['cashier:index']">查看详情</el-dropdown-item>
+              <el-dropdown-item command="handlePrint" icon="el-icon-printer" v-hasPermi="['cashier:index']">打印小票</el-dropdown-item>
+              <el-dropdown-item command="handlePay" v-if="scope.row.payStatus != 'B'" icon="el-icon-wallet" v-hasPermi="['cashier:index']">发起支付</el-dropdown-item>
+              <el-dropdown-item v-if="scope.row.payStatus == 'B'" command="handleRefund" icon="el-icon-s-order" v-hasPermi="['cashier:index']">立即退款</el-dropdown-item>
+              <el-dropdown-item v-if="scope.row.payStatus != 'B'" command="handleDelete" icon="el-icon-remove" v-hasPermi="['cashier:delete']">删除订单</el-dropdown-item>
             </el-dropdown-menu>
           </el-dropdown>
         </template>

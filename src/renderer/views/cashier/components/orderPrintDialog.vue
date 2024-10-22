@@ -19,6 +19,12 @@
               <div class="item" v-if="orderInfo.isVisitor == 'N'"><span class="t">会员号码：</span>{{ orderInfo.userInfo.userNo ? orderInfo.userInfo.userNo : '-' }}</div>
               <div class="item" v-if="orderInfo.isVisitor == 'Y'"><span class="t">会员信息：</span>无</div>
             </div>
+            <div v-if="orderInfo.orderMode == 'express' && orderInfo.address">****************************************</div>
+            <div class="address-info" v-if="orderInfo.orderMode == 'express' && orderInfo.address">
+              <div class="item">收货人名：{{ orderInfo.address.name ? orderInfo.address.name : '-' }}</div>
+              <div class="item">联系电话：{{ orderInfo.address.mobile ? orderInfo.address.mobile : '无' }}</div>
+              <div class="item">详细地址：{{orderInfo.address.provinceName}}{{orderInfo.address.cityName}}{{orderInfo.address.regionName}}{{orderInfo.address.detail}}</div>
+            </div>
             <div>****************************************</div>
             <div class="total-info">
               <div class="item">订单类型：{{ orderInfo.typeName }}</div>
@@ -100,6 +106,10 @@ export default {
          .item {
             clear: both;
          }
+      }
+      .address-info {
+         margin-top: 10px;
+         margin-bottom: 20px;
       }
       .total-info {
          .item {
