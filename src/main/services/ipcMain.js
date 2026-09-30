@@ -1,9 +1,10 @@
-import { ipcMain, dialog, BrowserWindow } from 'electron'
+import { ipcMain, dialog, BrowserWindow, app } from 'electron'
 import Server from '../server/index'
 import { winURL } from '../config/StaticPath'
 import downloadFile from './downloadFile'
 import Update from './checkupdate'
 import { updater } from './HotUpdater'
+import { getPrinterList, printHtml } from './printer'
 import {platform} from "os";
 
 export default {
@@ -26,6 +27,28 @@ export default {
     })
     ipcMain.handle('window-close', (event, args) => {
       BrowserWindow.fromWebContents(event.sender)?.close()
+    })
+    // 获取系统打印机列表
+    ipcMain.handle('printer-list', (event, args) => {
+      return getPrinterList(BrowserWindow.fromWebContents(event.sender))
+    })
+    // 静默打印小票
+    ipcMain.handle('print-silent', async (event, msg) => {
+      try {
+        const result = await printHtml(msg.html, { deviceName: msg.deviceName, copies: msg.copies })
+        return result
+      } catch (error) {
+        return { success: false, message: error && error.message ? error.message : String(error) }
+      }
+    })
+    // 获取客户端版本号
+    ipcMain.handle('get-app-version', () => {
+      return app.getVersion()
+    })
+    // 重启客户端
+    ipcMain.handle('restart-app', () => {
+      app.relaunch()
+      app.exit(0)
     })
     ipcMain.handle('start-download', (event, msg) => {
       downloadFile.download(BrowserWindow.fromWebContents(event.sender), msg.downloadUrL)

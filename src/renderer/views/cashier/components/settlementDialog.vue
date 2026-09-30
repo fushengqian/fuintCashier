@@ -2,21 +2,53 @@
     <el-dialog class="common-dialog" title="支付结算" :visible="showDialog" width="1100px" @close="cancel" destroy-on-close>
         <el-dialog class="common-dialog" width="800px" title="选择卡券" :visible.sync="showCouponDialog" append-to-body destroy-on-close>
           <div class="coupon-list">
-            <div class="none" v-if="!memberInfo || !myCouponList || myCouponList.length < 1">暂无可用卡券</div>
-            <div class="row" v-for="couponList in myCouponList">
-                <div class="item active" v-for="coupon in couponList">
-                  <div @click="useThisCoupon(coupon)">
-                    <div class="left">
-                       <div class="amount" v-if="coupon.content == '2'">{{ (coupon.amount / 10).toFixed(2) }}折</div>
-                       <div class="amount" v-else>{{ coupon.amount }}折</div>
-                       <div class="tips">{{ coupon.description }}</div>
-                    </div>
-                    <div class="right">
-                        <div class="name">{{ coupon.name }}</div>
-                        <div class="time">{{ coupon.effectiveDate }}</div>
-                    </div>
+            <div class="none" v-if="totalCardCount === 0">暂无可用卡券</div>
+            <!-- 优惠券（单选） -->
+            <div v-if="couponRadioList.length > 0">
+              <div class="section-title">优惠券（单选）</div>
+              <div class="row" v-for="(row, idx) in couponRadioGroup" :key="'cr-'+idx">
+                <div :class="['item', 'radio-item', selectedCouponId === c.userCouponId ? 'selected' : '']" v-for="c in row" :key="c.userCouponId" @click="selectCouponByRadio(c)">
+                  <span class="coupon-indicator">
+                    <span v-if="selectedCouponId === c.userCouponId" class="radio-dot">&#11044;</span>
+                    <span v-else class="radio-circle">&#9711;</span>
+                  </span>
+                  <div class="left">
+                     <div class="amount" v-if="c.content == '2'">{{ (c.amount / 10).toFixed(2) }}折</div>
+                     <div class="amount" v-else>￥{{ c.amount }}</div>
+                     <div class="tips">{{ c.description }}</div>
                   </div>
+                  <div class="right">
+                      <div class="name">{{ c.name }}</div>
+                      <div class="time">{{ c.effectiveDate }}</div>
+                  </div>
+                  <div v-if="selectedCouponId === c.userCouponId" class="check-mark">&#10003;</div>
                 </div>
+              </div>
+            </div>
+            <!-- 储值卡（多选） -->
+            <div v-if="prestoreCheckList.length > 0">
+              <div class="section-title">储值卡（多选）</div>
+              <div class="row" v-for="(row, idx) in prestoreCheckGroup" :key="'ps-'+idx">
+                <div :class="['item', 'checkbox-item', selectedCouponIds.includes(c.userCouponId) ? 'selected' : '']" v-for="c in row" :key="c.userCouponId" @click="togglePrestoreCard(c)">
+                  <span class="coupon-indicator">
+                    <span v-if="selectedCouponIds.includes(c.userCouponId)" class="checkbox-checked">&#9745;</span>
+                    <span v-else class="checkbox-empty">&#9744;</span>
+                  </span>
+                  <div class="left">
+                     <div class="amount" v-if="c.content == '2'">{{ (c.amount / 10).toFixed(2) }}折</div>
+                     <div class="amount" v-else>￥{{ c.amount }}</div>
+                     <div class="tips">{{ c.description }}</div>
+                  </div>
+                  <div class="right">
+                      <div class="name">{{ c.name }}</div>
+                      <div class="time">{{ c.effectiveDate }}</div>
+                  </div>
+                  <div v-if="selectedCouponIds.includes(c.userCouponId)" class="check-mark">&#10003;</div>
+                </div>
+              </div>
+            </div>
+            <div class="coupon-dialog-footer" style="margin-top: 20px; text-align: right;">
+              <el-button type="primary" size="small" @click="confirmCouponSelection">确认使用卡券</el-button>
             </div>
           </div>
         </el-dialog>
@@ -118,6 +150,7 @@
     </el-dialog>
 </template>
 <script>
+import { getSetting } from "@/utils/localSetting";
 export default {
     props: {
       showDialog: {
@@ -158,16 +191,16 @@ export default {
             }
             app.discountAmount = '';
             app.reduceAmount = '';
-            app.myCouponList = [];
             app.couponName = '';
             app.userCouponId = 0;
+            app.selectedCouponId = 0;
+            app.selectedCouponIds = [];
+            app.couponRadioList = [];
+            app.couponRadioGroup = [];
+            app.prestoreCheckList = [];
+            app.prestoreCheckGroup = [];
             app.remark = app.remarks;
             app.computerPrice(app.discountAmount, app.reduceAmount);
-            if (app.memberInfo) {
-                for (let i = 0, len = app.couponList.length; i < len; i += 2) {
-                     app.myCouponList.push(app.couponList.slice(i, i + 2));
-                }
-            }
          }
       },
       discountAmount(value) {
@@ -191,7 +224,8 @@ export default {
       return {
           loading: false,
           discountPrice: 0,
-          payType: '',
+          // 默认支付方式取自本机设置
+          payType: getSetting('defaultPayType'),
           userCouponId: 0,
           couponName: '',
           remark: '',
@@ -199,7 +233,18 @@ export default {
           reduceAmount: '',
           newTotalPrice: 0,
           showCouponDialog: false,
-          myCouponList: []
+          myCouponList: [],
+          selectedCouponIds: [],
+          selectedCouponId: 0,
+          couponRadioList: [],
+          couponRadioGroup: [],
+          prestoreCheckList: [],
+          prestoreCheckGroup: []
+      }
+    },
+    computed: {
+      totalCardCount() {
+        return this.couponRadioList.length + this.prestoreCheckList.length;
       }
     },
     methods: {
@@ -219,32 +264,79 @@ export default {
               app.$alert("请先关联会员信息！");
               app.$refs.remark.focus();
               return false;
-          } else {
-              app.myCouponList = [];
-              app.couponName = '';
-              app.userCouponId = 0;
-              app.computerPrice(app.discountAmount, app.reduceAmount);
-              if (app.memberInfo) {
-                  for (let i = 0, len = app.couponList.length; i < len; i += 2) {
-                       app.myCouponList.push(app.couponList.slice(i, i + 2));
-                  }
+          }
+          // 重置
+          app.couponName = '';
+          app.userCouponId = 0;
+          app.selectedCouponId = 0;
+          app.selectedCouponIds = [];
+          app.couponRadioList = [];
+          app.couponRadioGroup = [];
+          app.prestoreCheckList = [];
+          app.prestoreCheckGroup = [];
+          app.computerPrice(app.discountAmount, app.reduceAmount);
+
+          // 分离优惠券和储值卡
+          const couponList = [];
+          const prestoreList = [];
+          app.couponList.forEach(function(c) {
+              if (c.type === '储值卡') {
+                  prestoreList.push(c);
+              } else {
+                  couponList.push(c);
               }
-              app.showCouponDialog = true;
+          });
+          app.couponRadioList = couponList;
+          app.prestoreCheckList = prestoreList;
+          // 分组：每行2个
+          for (let i = 0; i < couponList.length; i += 2) {
+              app.couponRadioGroup.push(couponList.slice(i, i + 2));
+          }
+          for (let i = 0; i < prestoreList.length; i += 2) {
+              app.prestoreCheckGroup.push(prestoreList.slice(i, i + 2));
+          }
+          app.showCouponDialog = true;
+        },
+        // 优惠券单选
+        selectCouponByRadio(coupon) {
+          if (this.selectedCouponId === coupon.userCouponId) {
+              this.selectedCouponId = 0;
+          } else {
+              this.selectedCouponId = coupon.userCouponId;
+              // 优惠券和储值卡互斥，选择了优惠券则清空储值卡
+              this.selectedCouponIds = [];
           }
         },
-        // 使用该卡券
-        useThisCoupon(coupon) {
+        // 储值卡多选
+        togglePrestoreCard(coupon) {
+          const idx = this.selectedCouponIds.indexOf(coupon.userCouponId);
+          if (idx > -1) {
+              this.selectedCouponIds.splice(idx, 1);
+          } else {
+              // 优惠券和储值卡互斥，选择了储值卡则清空优惠券
+              this.selectedCouponId = 0;
+              this.selectedCouponIds.push(coupon.userCouponId);
+          }
+        },
+        // 确认卡券选择
+        confirmCouponSelection() {
           const app = this;
-          app.$confirm('确定使用该卡券吗？').then(function() {
-              app.$emit('useThisCoupon', coupon);
-              app.couponName = coupon.name;
-              app.userCouponId = coupon.userCouponId;
-              app.showCouponDialog = false;
-          }).then(() => {
-              // empty
-          }).catch(function() {
-              // empty
+          const names = [];
+          // 优惠券（单选）
+          if (app.selectedCouponId > 0) {
+              app.userCouponId = app.selectedCouponId;
+              const found = app.couponList.find(function(c) { return c.userCouponId === app.selectedCouponId; });
+              if (found) names.push(found.name);
+          } else {
+              app.userCouponId = 0;
+          }
+          // 储值卡（多选）
+          app.selectedCouponIds.forEach(function(id) {
+              const found = app.couponList.find(function(c) { return c.userCouponId === id; });
+              if (found) names.push(found.name);
           });
+          app.couponName = names.join('、');
+          app.showCouponDialog = false;
         },
         // 提交结算
         submit() {
@@ -253,12 +345,13 @@ export default {
               app.$alert("请先选择支付方式！");
               return false;
           }
-          app.$emit('submit', { payType: this.payType, totalPrice: this.newTotalPrice, remark: this.remark, discountPrice: this.discountPrice, userCouponId: app.userCouponId });
-          app.payType = '';
+          const couponIds = app.selectedCouponIds.length > 0 ? app.selectedCouponIds.join(',') : '';
+          app.$emit('submit', { payType: this.payType, totalPrice: this.newTotalPrice, remark: this.remark, discountPrice: this.discountPrice, userCouponId: app.userCouponId, couponIds: couponIds });
+          app.payType = getSetting('defaultPayType');
         },
         cancel() {
            this.$emit('closeDialog','settlementDialog');
-           this.payType = '';
+           this.payType = getSetting('defaultPayType');
         },
         computerPrice(discountAmount, reduceAmount) {
             if (this.orderInfo.id) {
@@ -296,11 +389,20 @@ export default {
 <style lang="scss" scoped>
    .coupon-list {
      text-align: center;
+     .section-title {
+        text-align: left;
+        font-weight: bold;
+        font-size: 14px;
+        color: #333333;
+        margin: 12px 0 8px;
+        padding-left: 8px;
+        border-left: 3px solid #00acac;
+     }
      .none {
         color: #666666;
      }
      .row {
-        height: 80px;
+        overflow: hidden;
         margin-bottom: 15px;
         .item {
             float: left;
@@ -310,14 +412,35 @@ export default {
             border: solid 2px #00acac;
             cursor: pointer;
             border-radius: 2px;
+            position: relative;
+            box-sizing: border-box;
+            .coupon-indicator {
+               position: absolute;
+               left: 6px;
+               top: 8px;
+               font-size: 20px;
+               line-height: 1;
+               z-index: 2;
+            }
+            .radio-dot, .checkbox-checked {
+               color: #ffffff;
+               text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+            }
+            .radio-circle, .checkbox-empty {
+               color: rgba(255,255,255,0.7);
+            }
+            &.radio-item .left, &.checkbox-item .left {
+                padding-left: 24px;
+            }
             .left {
                 width: 30%;
-                height: 80px;
+                height: 79px;
                 float: left;
                 background: #00acac;
                 color: #FFFFFF;
+                box-sizing: border-box;
                 .amount {
-                   font-size: 24px;
+                   font-size: 16px;
                    margin-top: 10px;
                    font-weight: bold;
                 }
@@ -332,7 +455,8 @@ export default {
                 margin-top: 10px;
                 text-align: left;
                 padding-left: 10px;
-                height: 80px;
+                height: 79px;
+                box-sizing: border-box;
                 .time {
                   margin-top: 3px;
                   font-size: 12px;
