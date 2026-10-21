@@ -16,32 +16,32 @@ fuint侧重于线下实体店的私域流量的运营，同时提供会员端小
 后端仓库：https://gitee.com/fuint/fuintStoreSystem
 
 #### 官网演示地址：
-1、官网：https://www.fuint.cn  点击 -> 系统演示，演示账号：fuint / 123456<br>
+1、官网：https://www.fuint.cn  点击 -> 系统演示，演示账号：fuint / 123456
 2、swagger接口文档：https://www.fuint.cn/fuint-application/swagger-ui.html
 
 #### 软件架构
 后端：JAVA SpringBoot + MYSQL Mybatis Plus + Redis
 前端：采用基于Element UI，前后端分离，支持微信小程序、h5等
 
-前端使用技术
-2.1 Vue3
-2.2 Electron-Vue-template
-2.3 Element UI
-2.4 Nodejs 16+
+#### 前端使用技术
+1. Vue3
+2. Electron-Vue-template
+3. Element UI
+4. Nodejs 16+
 
-后端使用技术
-1.1 SpringBoot 3.2
-1.2 Mybatis Plus
-1.3 Maven
-1.4 SpringSecurity
-1.5 Druid
-1.6 Slf4j
-1.7 Fastjson
-1.8 JWT
-1.9 Redis
-1.10 Quartz
-1.11 Mysql 5.7或8版
-1.12 Swagger UI
+#### 后端使用技术
+1. SpringBoot 3.2
+2. Mybatis Plus
+3. Maven
+4. SpringSecurity
+5. Druid
+6. Slf4j
+7. Fastjson
+8. JWT
+9. Redis
+10. Quartz
+11. Mysql 5.7或8版
+12. Swagger UI
 
 #### 允许使用范围：
 1. 允许个人学习使用
@@ -58,6 +58,6 @@ fuint侧重于线下实体店的私域流量的运营，同时提供会员端小
 
 
 特别鸣谢：<br>
-Mybaits Plus: https://github.com/baomidou/mybatis-plus<br>
-Vue: https://github.com/vuejs/vue<br>
-Element UI: https://element.eleme.cn
+1. Mybaits Plus: https://github.com/baomidou/mybatis-plus
+2. Vue: https://github.com/vuejs/vue
+3. Element UI Plus: https://element.eleme.cn
